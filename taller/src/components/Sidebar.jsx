@@ -3,6 +3,11 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
+// URL base del backend (Render en producción, localhost en dev)
+const API_BASE = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace('/api', '')
+  : 'http://localhost:3000';
+
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { logout, user } = useAuth();
@@ -27,10 +32,14 @@ const Sidebar = () => {
 
   const handleLogout = () => { logout(); navigate("/login"); };
 
-  // Use sidebar-specific colors for proper contrast on all themes
   const navTextColor = t.sidebarText;
   const navTextActive = t.sidebarTextActive;
   const sidebarBg = `linear-gradient(180deg, ${t.sidebar} 0%, ${t.sidebar}ee 100%)`;
+
+  // Construye la URL correcta de la foto de perfil
+  const avatarSrc = user?.profileImage
+    ? `${API_BASE}/uploads/${user.profileImage}`
+    : null;
 
   return (
     <aside style={{
@@ -80,8 +89,18 @@ const Sidebar = () => {
       {!isCollapsed && user && (
         <div className="px-4 py-3" style={{ borderBottom: `1px solid ${t.sidebarBorder}` }}>
           <div className="flex items-center gap-2">
-            <img src={user?.profileImage ? `http://localhost:3000/uploads/${user.profileImage}` : "/default-profile.png"}
-              alt="avatar" className="w-8 h-8 rounded-full object-cover" style={{ border: `2px solid ${t.accent}` }} />
+            {avatarSrc ? (
+              <img src={avatarSrc} alt="avatar"
+                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                style={{ border: `2px solid ${t.accent}` }}
+                onError={e => { e.target.style.display = 'none'; }}
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
+                style={{ background: `${t.accent}30`, color: t.accent, border: `2px solid ${t.accent}` }}>
+                {user?.nombres?.[0]}{user?.apellidos?.[0]}
+              </div>
+            )}
             <div className="overflow-hidden">
               <p className="text-xs font-semibold truncate" style={{ color: "#fff" }}>{user?.nombres} {user?.apellidos}</p>
               <p className="text-xs truncate" style={{ color: navTextColor }}>{user?.cargo}</p>
@@ -99,11 +118,7 @@ const Sidebar = () => {
               <li key={to}>
                 <Link to={to} title={isCollapsed ? label : undefined}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all relative group"
-                  style={{
-                    background: active ? `${t.accent}25` : "transparent",
-                    color: active ? navTextActive : navTextColor,
-                    borderLeft: active ? `2px solid ${t.accent}` : "2px solid transparent",
-                  }}>
+                  style={{ background: active ? `${t.accent}25` : "transparent", color: active ? navTextActive : navTextColor, borderLeft: active ? `2px solid ${t.accent}` : "2px solid transparent" }}>
                   <span className="material-icons text-xl flex-shrink-0">{icon}</span>
                   {!isCollapsed && <span>{label}</span>}
                   {isCollapsed && (
@@ -122,7 +137,7 @@ const Sidebar = () => {
         <div className="px-3 py-2" style={{ borderTop: `1px solid ${t.sidebarBorder}` }}>
           <button onClick={async () => {
             try {
-              const res = await fetch("http://localhost:3000/api/tasks/backup", { credentials: "include" });
+              const res = await fetch(`${API_BASE}/api/tasks/backup`, { credentials: "include" });
               const blob = await res.blob();
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a"); a.href = url;
@@ -139,7 +154,7 @@ const Sidebar = () => {
       {/* Logout */}
       <div className="p-2" style={{ borderTop: `1px solid ${t.sidebarBorder}` }}>
         <button onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
           style={{ color: navTextColor }}
           onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.15)"; e.currentTarget.style.color = "#f87171"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = navTextColor; }}>

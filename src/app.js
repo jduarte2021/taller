@@ -15,7 +15,25 @@ import pdfRoutes from "./routes/pdf.routes.js";
 const app = express();
 const __dirname = path.resolve();
 
-app.use(cors({ origin: 'https://taller-ten-amber.vercel.app', credentials: true }));
+// Orígenes permitidos: localhost en dev, Vercel en producción
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.https://taller-ten-amber.vercel.app,           // URL de Vercel que se configura en Render
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (Postman, curl) y orígenes en la lista
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS bloqueado para: ${origin}`));
+    }
+  },
+  credentials: true,
+}));
+
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
