@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { getAvatarUrl } from "../api/config.js";
 import Swal from "sweetalert2";
 
 const ROLES = ["Administrador", "Jefe de Taller", "Mecánico", "Recepcionista"];
@@ -11,7 +12,6 @@ export default function ProfilePage() {
   const { theme: t } = useTheme();
   const [profileImage, setProfileImage] = useState(null);
   const [saving, setSaving] = useState(false);
-
   const isSuperAdmin = user?.username === "jduarte" || user?.email?.includes("jimmy.duarte");
 
   const [formData, setFormData] = useState({
@@ -34,31 +34,21 @@ export default function ProfilePage() {
     data.append("nombre", formData.nombre);
     data.append("apellido", formData.apellido);
     data.append("email", formData.email);
-    data.append("cargo", formData.cargo); // always send current cargo
+    data.append("cargo", formData.cargo);
     if (profileImage) data.append("profileImage", profileImage);
-
     try {
-      const res = await axios.put("/api/profile", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
+      const res = await axios.put("/api/profile", data, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
       updateUserProfile(res.data);
       setProfileImage(null);
       Swal.fire({ title: "¡Perfil actualizado!", icon: "success", background: t.bgCard, color: t.text, timer: 1500, showConfirmButton: false });
     } catch (error) {
-      console.error("Error:", error.response?.data);
       Swal.fire({ title: "Error al guardar", text: error.response?.data?.message || "Error desconocido", icon: "error", background: t.bgCard, color: t.text });
     }
     setSaving(false);
   };
 
-  const BACKEND = "https://taller-8qh1.onrender.com";
-  const previewSrc = profileImage
-    ? URL.createObjectURL(profileImage)
-    : user?.profileImage
-      ? `${BACKEND}/uploads/${user.profileImage}`
-      : null;
-  const initials = (user?.nombres?.[0]||"")+(user?.apellidos?.[0]||"");
+  const avatarSrc = profileImage ? URL.createObjectURL(profileImage) : getAvatarUrl(user?.profileImage);
+  const initials = `${user?.nombres?.[0] || ""}${user?.apellidos?.[0] || ""}`;
 
   return (
     <div className="min-h-screen p-6" style={{ background: t.bg, color: t.text }}>
@@ -68,59 +58,50 @@ export default function ProfilePage() {
           <p className="text-sm mt-1" style={{ color: t.textMuted }}>Actualiza tu información y foto de perfil</p>
         </div>
 
-        {/* Avatar */}
         <div className="rounded-2xl p-6 mb-6 flex items-center gap-6" style={{ background: t.bgCard, border: `1px solid ${t.border}` }}>
           <div className="relative flex-shrink-0">
-            <img src={previewSrc} alt="Foto de perfil"
-                className="w-24 h-24 rounded-full object-cover"
-                style={{ border: "3px solid "+t.accent }}
-                onError={e => { e.target.style.display="none"; }} />
-            {profileImage && (
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: t.accent }}>
-                <span className="material-icons text-xs text-white">check</span>
-              </div>
+            {avatarSrc ? (
+              <img src={avatarSrc} alt="avatar" className="w-24 h-24 rounded-full object-cover"
+                style={{ border: `3px solid ${t.accent}` }}
+                onError={e => { e.target.style.display = "none"; }} />
+            ) : (
+              <div className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-black"
+                style={{ background: `${t.accent}20`, color: t.accent, border: `3px solid ${t.accent}` }}>{initials}</div>
             )}
+            {profileImage && <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: t.accent }}><span className="material-icons text-xs text-white">check</span></div>}
           </div>
           <div className="flex-1">
             <h2 className="text-xl font-black" style={{ color: t.text }}>{user?.nombres} {user?.apellidos}</h2>
             <p className="text-sm mt-0.5" style={{ color: t.accent }}>{user?.cargo}</p>
             <p className="text-xs mt-0.5" style={{ color: t.textMuted }}>{user?.email}</p>
-            <label className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all hover:opacity-80"
+            <label className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer hover:opacity-80"
               style={{ background: `${t.accent}20`, color: t.accent, border: `1px solid ${t.accent}40` }}>
               <span className="material-icons text-sm">photo_camera</span>
-              {profileImage ? `✓ ${profileImage.name}` : "Cambiar foto de perfil"}
+              {profileImage ? `✓ ${profileImage.name}` : "Cambiar foto"}
               <input type="file" accept="image/*" onChange={e => setProfileImage(e.target.files[0])} className="hidden" />
             </label>
-            {profileImage && (
-              <button type="button" onClick={() => setProfileImage(null)} className="ml-2 text-xs hover:opacity-80" style={{ color: "#f87171" }}>✕ Quitar</button>
-            )}
+            {profileImage && <button type="button" onClick={() => setProfileImage(null)} className="ml-2 text-xs" style={{ color: "#f87171" }}>✕</button>}
           </div>
         </div>
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit} className="rounded-2xl p-6 space-y-4" style={{ background: t.bgCard, border: `1px solid ${t.border}` }}>
-          <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: t.textMuted }}>Información personal</h3>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: t.textMuted }}>Nombres</label>
-              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} className={inp} style={is} placeholder="Tus nombres" />
+              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} className={inp} style={is} />
             </div>
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: t.textMuted }}>Apellidos</label>
-              <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} className={inp} style={is} placeholder="Tus apellidos" />
+              <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} className={inp} style={is} />
             </div>
           </div>
-
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: t.textMuted }}>Email</label>
             <input type="email" name="email" value={formData.email} disabled className={inp} style={isDisabled} />
-            <p className="text-xs mt-1" style={{ color: t.textMuted }}>El email no se puede modificar</p>
           </div>
-
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: t.textMuted }}>
-              Cargo {isSuperAdmin && <span style={{ color: t.accent }}>(editable — Superadmin)</span>}
+              Cargo {isSuperAdmin && <span style={{ color: t.accent }}>(editable)</span>}
             </label>
             {isSuperAdmin ? (
               <select name="cargo" value={formData.cargo} onChange={handleChange} className={inp} style={is}>
@@ -128,21 +109,15 @@ export default function ProfilePage() {
                 {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
             ) : (
-              <>
-                <input type="text" name="cargo" value={formData.cargo} disabled className={inp} style={isDisabled} />
-                <p className="text-xs mt-1" style={{ color: t.textMuted }}>El cargo es asignado por el administrador</p>
-              </>
+              <input type="text" name="cargo" value={formData.cargo} disabled className={inp} style={isDisabled} />
             )}
           </div>
-
-          <div className="pt-2">
-            <button type="submit" disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-              style={{ background: `linear-gradient(135deg,${t.accent},${t.accentSecondary})` }}>
-              <span className="material-icons text-sm">{saving ? "hourglass_empty" : "save"}</span>
-              {saving ? "Guardando..." : "Guardar cambios"}
-            </button>
-          </div>
+          <button type="submit" disabled={saving}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+            style={{ background: `linear-gradient(135deg,${t.accent},${t.accentSecondary})` }}>
+            <span className="material-icons text-sm">{saving ? "hourglass_empty" : "save"}</span>
+            {saving ? "Guardando..." : "Guardar cambios"}
+          </button>
         </form>
       </div>
     </div>
