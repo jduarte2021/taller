@@ -2,6 +2,8 @@ import express from 'express';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import path from "path";
 
 import authRoutes from './routes/auth.routes.js';
@@ -15,13 +17,34 @@ import pdfRoutes from "./routes/pdf.routes.js";
 const app = express();
 const __dirname = path.resolve();
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://taller-ten-amber.vercel.app'
+];
+
 app.use(cors({
-  origin: 'https://taller-ten-amber.vercel.app',
-  credentials: true,
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS bloqueado'));
+    }
+  },
+  credentials: true
 }));
 
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Demasiadas solicitudes desde esta IP'
+});
+
+app.use(limiter);
+
 app.use(morgan('dev'));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 
 app.use("/api", authRoutes);
@@ -34,3 +57,13 @@ app.use("/api", pdfRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "src", "uploads")));
 
 export default app;
+
+
+// Middleware global de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  res.status(err.status || 500).json({
+    message: err.message || 'Error interno del servidor'
+  });
+});

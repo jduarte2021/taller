@@ -5,11 +5,12 @@ import jwt from 'jsonwebtoken';
 import {TOKEN_SECRET} from '../config.js'
 import { createLog } from './log.controller.js';
 
-// CRÍTICO: SameSite=None + Secure=true para cookies cross-domain (Vercel → Render)
+const isProduction = process.env.NODE_ENV === 'production';
+
 const cookieOptions = {
   httpOnly: true,
-  secure: true,          // HTTPS obligatorio en producción
-  sameSite: 'none',      // Permite envío cross-site
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
   maxAge: 24 * 60 * 60 * 1000,
 };
 
