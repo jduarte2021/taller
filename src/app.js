@@ -19,7 +19,7 @@ const __dirname = path.resolve();
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
-  process.env.https://taller-ten-amber.vercel.app,           // URL de Vercel que se configura en Render
+  'process.env.https://taller-ten-amber.vercel.app',           // URL de Vercel que se configura en Render
 ].filter(Boolean);
 
 app.use(cors({
