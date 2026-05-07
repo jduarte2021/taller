@@ -25,10 +25,10 @@ export default function UsersAdminPage() {
   const fetchUsers = async () => {
     try {
       const res = await axios.get("/api/users/all", { withCredentials: true });
-      setUsers(Array.isArray(res.data) ? res.data : (res.data?.users || []));
+      setUsers(res.data);
     } catch {
       const res = await axios.get("/api/users", { withCredentials: true });
-      setUsers(Array.isArray(res.data) ? res.data : (res.data?.users || []));
+      setUsers(res.data);
     }
     setLoading(false);
   };
@@ -108,7 +108,7 @@ export default function UsersAdminPage() {
               style={{ background: tab===key?`linear-gradient(135deg,${t.accent},${t.accentSecondary})`:t.bgSecondary, color: tab===key?"#fff":t.textMuted }}>
               <span className="material-icons text-sm">{icon}</span>{label}
             </button>
-          )) : null}
+          ))}
         </div>
 
         {/* Lista */}
@@ -121,11 +121,11 @@ export default function UsersAdminPage() {
                     ...(isSuperAdmin ? ["Cambiar rol",""] : [])
                   ].map((h,i) => (
                     <th key={i} className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wider" style={{ color: t.textMuted }}>{h}</th>
-                  )) : null}
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(users) ? users.map((u, i) => {
+                {users.map((u, i) => {
                   const isMe = u.email === user?.email;
                   const isSA = u.email?.includes("jimmy.duarte");
                   return (
@@ -146,7 +146,7 @@ export default function UsersAdminPage() {
                                 onChange={e => handleRoleChange(u._id, e.target.value)}
                                 className="text-xs px-2 py-1.5 rounded-lg outline-none"
                                 style={{ background:t.input, border:`1px solid ${t.inputBorder}`, color:t.text }}>
-                                {Array.isArray(ROLES) ? ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                                {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                               </select>
                             )}
                           </td>
@@ -181,11 +181,11 @@ export default function UsersAdminPage() {
                     onChange={e => setForm({...form,[field]:e.target.value})}
                     className={inp} style={is} required />
                 </div>
-              )) : null}
+              ))}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color:t.textMuted }}>Cargo *</label>
                 <select value={form.cargo} onChange={e => setForm({...form,cargo:e.target.value})} className={inp} style={is}>
-                  {Array.isArray(ROLES) ? ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                  {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
               </div>
             </div>

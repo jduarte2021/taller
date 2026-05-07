@@ -83,19 +83,7 @@ export default function TaskFormPage() {
   const is = { background: t.input, border: `1px solid ${t.inputBorder}`, color: t.text };
 
   useEffect(() => {
-    axios.get("/api/users", { withCredentials: true })
-      .then(r => {
-        const data = Array.isArray(r.data)
-          ? r.data
-          : Array.isArray(r.data?.users)
-            ? r.data.users
-            : [];
-
-        setUsers(data);
-      })
-      .catch(() => {
-        setUsers([]);
-      });
+    axios.get("/api/users", { withCredentials: true }).then(r => setUsers(r.data)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -268,7 +256,7 @@ export default function TaskFormPage() {
               <Field label="Marca" error={errors.carBrand && "Requerido"}>
                 <select {...register("carBrand", { required: true })} className={inp} style={is}>
                   <option value="">Selecciona una marca</option>
-                  {Array.isArray(carBrands) ? carBrands.map((b, i) => <option key={i} value={b}>{b}</option>)}
+                  {carBrands.map((b, i) => <option key={i} value={b}>{b}</option>)}
                 </select>
               </Field>
               {selectedBrand === "Otro" && (
@@ -330,15 +318,15 @@ export default function TaskFormPage() {
                     <div className="mt-2 p-2.5 rounded-lg text-xs space-y-1" style={{ background: t.bgSecondary }}>
                       <div className="flex justify-between" style={{ color: t.textMuted }}>
                         <span>Neto</span>
-                        <span>${new Intl.NumberFormat("es-CL").format(Number(watch("servicePrice"))) : null} CLP</span>
+                        <span>${new Intl.NumberFormat("es-CL").format(Number(watch("servicePrice")))} CLP</span>
                       </div>
                       <div className="flex justify-between" style={{ color: t.textMuted }}>
                         <span>IVA (19%)</span>
-                        <span>${new Intl.NumberFormat("es-CL").format(Math.round(Number(watch("servicePrice")) * 0.19)) : null} CLP</span>
+                        <span>${new Intl.NumberFormat("es-CL").format(Math.round(Number(watch("servicePrice")) * 0.19))} CLP</span>
                       </div>
                       <div className="flex justify-between font-bold pt-1" style={{ borderTop: `1px solid ${t.border}`, color: "#4ade80" }}>
                         <span>Total c/IVA</span>
-                        <span>${new Intl.NumberFormat("es-CL").format(Math.round(Number(watch("servicePrice")) * 1.19)) : null} CLP</span>
+                        <span>${new Intl.NumberFormat("es-CL").format(Math.round(Number(watch("servicePrice")) * 1.19))} CLP</span>
                       </div>
                     </div>
                   )}
@@ -346,11 +334,7 @@ export default function TaskFormPage() {
                 <Field label="Mecánico / Personal Asignado" error={errors.assignedTo && "Requerido"}>
                   <select {...register("assignedTo", { required: true })} className={inp} style={is}>
                     <option value="">Selecciona un usuario</option>
-                    {Array.isArray(users) && Array.isArray(users) ? users.map(u => (
-                      <option key={u._id} value={u._id}>
-                        {u.username || u.email}
-                      </option>
-                    )) : null}
+                    {users.map(u => <option key={u._id} value={u._id}>{u.username || u.email}</option>)}
                   </select>
                 </Field>
               </div>

@@ -61,7 +61,7 @@ export default function TaskSearchPage() {
 
   const handleComplete = async (taskId) => {
     await axios.put(`/api/tasks/${taskId}/complete`, {}, { withCredentials: true });
-    setTasks(prev => Array.isArray(prev) ? prev.map(tk => tk._id === taskId ? {...tk, status:"completada"} : tk));
+    setTasks(prev => prev.map(tk => tk._id === taskId ? {...tk, status:"completada"} : tk));
     Swal.fire({ title:"¡Completada!", icon:"success", background:t.bgCard, color:t.text, timer:1500, showConfirmButton:false });
   };
 
@@ -127,7 +127,7 @@ TallerData — Software para Taller Mecánico`;
 
         {/* Tabs tipo de búsqueda */}
         <div className="flex gap-2 mb-3 flex-wrap">
-          {Array.isArray(SEARCH_TYPES) ? SEARCH_TYPES.map(({ key, icon, label }) => (
+          {SEARCH_TYPES.map(({ key, icon, label }) => (
             <button key={key} onClick={() => { setSearchType(key); setQuery(""); setTasks([]); setError(""); }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
               style={{
@@ -137,7 +137,7 @@ TallerData — Software para Taller Mecánico`;
               }}>
               <span className="material-icons text-sm">{icon}</span>{label}
             </button>
-          )) : null}
+          ))}
         </div>
 
         {/* Campo de búsqueda */}
@@ -190,7 +190,7 @@ TallerData — Software para Taller Mecánico`;
 
         {!loading && tasks.length > 0 && (
           <div className="space-y-3">
-            {Array.isArray(tasks) ? tasks.map(task => {
+            {tasks.map(task => {
               const isExpanded = expandedId === task._id;
               const neto = task.servicePrice || 0;
               const iva = Math.round(neto * 0.19);
@@ -251,7 +251,7 @@ TallerData — Software para Taller Mecánico`;
                             <div className="text-xs" style={{ color: t.textMuted }}>{k}</div>
                             <div className="font-medium" style={{ color: t.text }}>{v}</div>
                           </div>
-                        )) : null}
+                        ))}
                       </div>
 
                       {/* Precio con IVA */}
@@ -277,7 +277,7 @@ TallerData — Software para Taller Mecánico`;
                           <div className="text-xs font-semibold mb-1" style={{ color: t.textMuted }}>{k}</div>
                           <p className="text-sm" style={{ color: t.text }}>{v}</p>
                         </div>
-                      )) : null}
+                      ))}
 
                       {/* Acciones */}
                       <div className="flex gap-2 flex-wrap mt-4">

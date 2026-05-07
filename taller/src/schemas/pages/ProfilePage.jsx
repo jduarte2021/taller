@@ -1,4 +1,3 @@
-import api from "../api/axios";
 import axios from "axios";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -38,7 +37,7 @@ export default function ProfilePage() {
     data.append("cargo", formData.cargo);
     if (profileImage) data.append("profileImage", profileImage);
     try {
-      const res = await api.put("/profile", data, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
+      const res = await axios.put("/api/profile", data, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
       updateUserProfile(res.data);
       setProfileImage(null);
       Swal.fire({ title: "¡Perfil actualizado!", icon: "success", background: t.bgCard, color: t.text, timer: 1500, showConfirmButton: false });
@@ -107,7 +106,7 @@ export default function ProfilePage() {
             {isSuperAdmin ? (
               <select name="cargo" value={formData.cargo} onChange={handleChange} className={inp} style={is}>
                 <option value="superadmin">Superadmin</option>
-                {Array.isArray(ROLES) ? ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
             ) : (
               <input type="text" name="cargo" value={formData.cargo} disabled className={inp} style={isDisabled} />

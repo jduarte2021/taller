@@ -69,7 +69,7 @@ export default function ClientsPage() {
               <div className="flex flex-col items-center py-12" style={{ color: t.textMuted }}>
                 <span className="material-icons text-4xl mb-2">person_search</span><p>No se encontraron clientes</p>
               </div>
-            ) : Array.isArray(filtered) ? filtered.map(client => (
+            ) : filtered.map(client => (
               <button key={client.rut} onClick={() => { setSelected(client); setEmailMsg(""); }}
                 className="w-full text-left p-4 rounded-xl transition-all"
                 style={{ background: selected?.rut === client.rut ? `${t.accent}15` : t.bgCard, border: `1px solid ${selected?.rut === client.rut ? t.accent : t.border}` }}>
@@ -80,7 +80,7 @@ export default function ClientsPage() {
                   <span className="text-xs" style={{ color: "#4ade80" }}>{client.orders.filter(o => o.status === "completada").length} completadas</span>
                 </div>
               </button>
-            )) : null}
+            ))}
           </div>
 
           {/* Detalle */}
@@ -99,7 +99,7 @@ export default function ClientsPage() {
                       <p className="text-sm" style={{ color: t.textMuted }}>{selected.rut}</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-lg font-black" style={{ color: "#4ade80" }}>${new Intl.NumberFormat("es-CL").format(totalIngresos(selected)) : null}</div>
+                      <div className="text-lg font-black" style={{ color: "#4ade80" }}>${new Intl.NumberFormat("es-CL").format(totalIngresos(selected))}</div>
                       <div className="text-xs" style={{ color: t.textMuted }}>ingresos generados</div>
                     </div>
                   </div>
@@ -108,13 +108,13 @@ export default function ClientsPage() {
                       ["🔢 Total visitas", selected.orders.length],
                       ["✅ Completadas", selected.orders.filter(o => o.status === "completada").length],
                       ["⏳ En curso", selected.orders.filter(o => o.status === "en curso").length],
-                      ["📅 Primera visita", new Date(Math.min(...selected.Array.isArray(orders) ? orders.map(o => new Date(o.date)))).toLocaleDateString("es-CL")],
+                      ["📅 Primera visita", new Date(Math.min(...selected.orders.map(o => new Date(o.date)))).toLocaleDateString("es-CL")],
                     ].map(([k, v]) => (
                       <div key={k} className="flex flex-col p-2 rounded-lg" style={{ background: t.bgSecondary }}>
                         <span className="text-xs" style={{ color: t.textMuted }}>{k}</span>
                         <span className="font-semibold" style={{ color: t.text }}>{v}</span>
                       </div>
-                    )) : null}
+                    ))}
                   </div>
                 </div>
 
@@ -163,7 +163,7 @@ export default function ClientsPage() {
                           <div className="text-xs" style={{ color: t.textMuted }}>${new Intl.NumberFormat("es-CL").format(o.servicePrice || 0)}</div>
                         </div>
                       </div>
-                    )) : null}
+                    ))}
                   </div>
                 </div>
               </div>
