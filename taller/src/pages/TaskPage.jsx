@@ -113,7 +113,7 @@ export default function TaskPage() {
                 style={{background:filter===val?(val==="completada"?"#052e16":val==="en curso"?"#451a03":`${t.accent}20`):t.bgSecondary, color:filter===val?(val==="completada"?"#4ade80":val==="en curso"?"#fb923c":t.accent):t.textMuted}}>
                 {label}
               </button>
-            ))}
+            )) : null}
           </div>
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-3 py-2.5 rounded-xl text-xs outline-none" style={{background:t.input,border:`1px solid ${t.inputBorder}`,color:t.text}}>
             <option value="date_desc">📅 Más recientes</option>
@@ -130,7 +130,7 @@ export default function TaskPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {paginated.map(task => {
+            {Array.isArray(paginated) ? paginated.map(task => {
               const isExpanded = expandedId === task._id;
               const neto = task.servicePrice || 0;
               const iva = Math.round(neto * 0.19);
@@ -168,14 +168,14 @@ export default function TaskPage() {
                             <div className="text-xs" style={{color:t.textMuted}}>{k}</div>
                             <div className="font-medium" style={{color:t.text}}>{v}</div>
                           </div>
-                        ))}
+                        )) : null}
                       </div>
                       {[["Motivo de Ingreso",task.motivoIngreso],["Diagnóstico Taller",task.diagnosticoTaller],["Descripción Reparación / Cambio de Piezas",task.repairDescription],["Observaciones",task.description]].filter(([,v])=>v).map(([k,v])=>(
                         <div key={k} className="mt-3 p-3 rounded-xl" style={{background:t.bgSecondary}}>
                           <div className="text-xs font-semibold mb-1" style={{color:t.textMuted}}>{k}</div>
                           <p className="text-sm" style={{color:t.text}}>{v}</p>
                         </div>
-                      ))}
+                      )) : null}
                       <div className="flex gap-2 flex-wrap mt-4 no-print">
                         {isAdmin && (
                           <>
@@ -210,11 +210,11 @@ export default function TaskPage() {
         {/* Paginación */}
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-8">
-            <button onClick={() => setPage(p => Math.max(1,p-1))} disabled={page===1} className="px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-30" style={{background:t.bgSecondary,color:t.textMuted}}>← Anterior</button>
+            <button onClick={() => setPage(p => Math.max(1,p-1)) : null} disabled={page===1} className="px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-30" style={{background:t.bgSecondary,color:t.textMuted}}>← Anterior</button>
             {Array.from({length:totalPages},(_,i)=>i+1).map(p=>(
               <button key={p} onClick={()=>setPage(p)} className="w-9 h-9 rounded-lg text-sm font-bold" style={{background:p===page?`linear-gradient(135deg,${t.accent},${t.accentSecondary})`:t.bgSecondary,color:p===page?"#fff":t.textMuted}}>{p}</button>
-            ))}
-            <button onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages} className="px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-30" style={{background:t.bgSecondary,color:t.textMuted}}>Siguiente →</button>
+            )) : null}
+            <button onClick={()=>setPage(p=>Math.min(totalPages,p+1)) : null} disabled={page===totalPages} className="px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-30" style={{background:t.bgSecondary,color:t.textMuted}}>Siguiente →</button>
           </div>
         )}
       </div>

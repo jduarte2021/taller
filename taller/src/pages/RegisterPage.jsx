@@ -36,7 +36,7 @@ function RegisterPage() {
                     <div key={i} className="bg-red-500 text-white p-2 mb-2 rounded text-center">
                         {error}
                     </div>
-                ))}
+                )) : null}
 
                 {/* Formulario */}
                 <form onSubmit={onSubmit}>
@@ -66,11 +66,11 @@ function RegisterPage() {
                             className="w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="" disabled>Selecciona un cargo</option>
-                            {cargos.map((item, index) => (
+                            {Array.isArray(cargos) ? cargos.map((item, index) => (
                                 <option key={index} value={item}>
                                     {item}
                                 </option>
-                            ))}
+                            )) : null}
                         </select>
                         {errors.cargo && <p className="text-red-500 text-sm">{errors.cargo.message}</p>}
 

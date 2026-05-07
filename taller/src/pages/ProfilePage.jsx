@@ -1,3 +1,4 @@
+import api from "../api/axios";
 import axios from "axios";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -38,7 +39,7 @@ export default function ProfilePage() {
     if (profileImage) data.append("profileImage", profileImage);
 
     try {
-      const res = await axios.put("/api/profile", data, {
+      const res = await api.put("/profile", data, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -125,7 +126,7 @@ export default function ProfilePage() {
             {isSuperAdmin ? (
               <select name="cargo" value={formData.cargo} onChange={handleChange} className={inp} style={is}>
                 <option value="superadmin">Superadmin</option>
-                {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                {Array.isArray(ROLES) ? ROLES.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
             ) : (
               <>

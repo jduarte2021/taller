@@ -65,7 +65,7 @@ const Sidebar = () => {
                 style={{ background: themeName === th.name ? th.accent : "rgba(255,255,255,0.1)", color: themeName === th.name ? "#fff" : navTextColor, border: `1px solid ${themeName === th.name ? th.accent : "rgba(255,255,255,0.15)"}` }}>
                 {th.label === "Oscuro" ? "🌙" : th.label === "Taller" ? "🔧" : "☀️"}
               </button>
-            ))}
+            )) : null}
           </div>
           <button onClick={toggleLargeFonts}
             className="mt-2 w-full py-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all"
@@ -102,7 +102,7 @@ const Sidebar = () => {
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto">
         <ul className="flex flex-col gap-0.5 px-2">
-          {NAV_ITEMS.map(({ to, icon, label }) => {
+          {Array.isArray(NAV_ITEMS) ? NAV_ITEMS.map(({ to, icon, label }) => {
             const active = location.pathname === to;
             return (
               <li key={to}>

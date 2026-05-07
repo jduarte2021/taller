@@ -16,10 +16,10 @@ function StatCard({ icon, label, value, sub, accent, t }) {
 }
 
 function BarChart({ data, color, t }) {
-  const max = Math.max(...data.map(d => d.value), 1);
+  const max = Math.max(...Array.isArray(data) ? data.map(d => d.value), 1);
   return (
     <div className="flex items-end gap-1 h-32 w-full">
-      {data.map((d, i) => (
+      {Array.isArray(data) ? data.map((d, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-1">
           <span className="text-xs font-bold" style={{ color: t.text }}>
             {d.value > 0 ? `$${new Intl.NumberFormat("es-CL", { notation: "compact" }).format(d.value)}` : ""}
@@ -31,7 +31,7 @@ function BarChart({ data, color, t }) {
           }} />
           <span className="text-xs" style={{ color: t.textMuted }}>{d.label}</span>
         </div>
-      ))}
+      )) : null}
     </div>
   );
 }
@@ -128,7 +128,7 @@ export default function StatsPage() {
               <p className="text-sm" style={{ color: t.textMuted }}>Sin datos</p>
             ) : (
               <div className="space-y-3">
-                {stats.mecRanking.map(([name, count], i) => (
+                {stats.Array.isArray(mecRanking) ? mecRanking.map(([name, count], i) => (
                   <div key={name} className="flex items-center gap-3">
                     <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black"
                       style={{ background: i === 0 ? "#f59e0b" : i === 1 ? "#94a3b8" : i === 2 ? "#b45309" : t.bgSecondary, color: "#fff" }}>
@@ -147,7 +147,7 @@ export default function StatsPage() {
                       </div>
                     </div>
                   </div>
-                ))}
+                )) : null}
               </div>
             )}
           </div>
@@ -167,7 +167,7 @@ export default function StatsPage() {
                   <span className="text-sm" style={{ color: t.textMuted }}>{k}</span>
                   <span className="text-sm font-bold" style={{ color: t.text }}>{v}</span>
                 </div>
-              ))}
+              )) : null}
             </div>
           </div>
         </div>

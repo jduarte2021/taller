@@ -43,7 +43,7 @@ export default function LogsPage() {
 
   const filtered = filterAction === "all" ? logs : logs.filter(l => l.action === filterAction);
 
-  const uniqueActions = [...new Set(logs.map(l => l.action))];
+  const uniqueActions = [...new Set(Array.isArray(logs) ? logs.map(l => l.action))];
 
   return (
     <div className="min-h-screen p-6" style={{ background: t.bg, color: t.text }}>
@@ -67,7 +67,7 @@ export default function LogsPage() {
             style={{ background: filterAction === "all" ? t.accent : t.bgSecondary, color: filterAction === "all" ? "#fff" : t.textMuted }}>
             Todos ({logs.length})
           </button>
-          {uniqueActions.map(action => {
+          {Array.isArray(uniqueActions) ? uniqueActions.map(action => {
             const cfg = ACTION_COLORS[action] || { bg: t.bgSecondary, text: t.textMuted };
             const count = logs.filter(l => l.action === action).length;
             return (
@@ -90,7 +90,7 @@ export default function LogsPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {filtered.map(log => {
+            {Array.isArray(filtered) ? filtered.map(log => {
               const cfg = ACTION_COLORS[log.action] || { bg: t.bgSecondary, text: t.textMuted, icon: "info" };
               return (
                 <div key={log._id} className="flex items-start gap-4 p-4 rounded-2xl"
@@ -126,7 +126,7 @@ export default function LogsPage() {
         {/* Paginación */}
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-8">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+            <button onClick={() => setPage(p => Math.max(1, p - 1)) : null} disabled={page === 1}
               className="px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-30"
               style={{ background: t.bgSecondary, color: t.textMuted }}>← Anterior</button>
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map(p => (
@@ -135,8 +135,8 @@ export default function LogsPage() {
                 style={{ background: p === page ? `linear-gradient(135deg,${t.accent},${t.accentSecondary})` : t.bgSecondary, color: p === page ? "#fff" : t.textMuted }}>
                 {p}
               </button>
-            ))}
-            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+            )) : null}
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1)) : null} disabled={page === totalPages}
               className="px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-30"
               style={{ background: t.bgSecondary, color: t.textMuted }}>Siguiente →</button>
           </div>

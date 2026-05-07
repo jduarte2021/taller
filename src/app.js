@@ -67,3 +67,6 @@ app.use((err, req, res, next) => {
     message: err.message || 'Error interno del servidor'
   });
 });
+
+
+app.use('/uploads', express.static(path.resolve('src/uploads')));

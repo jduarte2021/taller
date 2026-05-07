@@ -8,10 +8,10 @@ import axios from "axios";
 import { generateOrderPDF } from "../utils/pdfGenerator.js";
 
 function BarChart({ data, color }) {
-  const max = Math.max(...data.map(d => d.value), 1);
+  const max = Math.max(...Array.isArray(data) ? data.map(d => d.value), 1);
   return (
     <svg viewBox="0 0 200 60" className="w-full h-16">
-      {data.map((d, i) => {
+      {Array.isArray(data) ? data.map((d, i) => {
         const h = Math.max(4, (d.value / max) * 52);
         const x = i * (200 / data.length) + 4;
         return (
@@ -32,7 +32,7 @@ function DonutChart({ slices }) {
   return (
     <svg viewBox="0 0 100 100" className="w-28 h-28">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth="14" />
-      {slices.map((s, i) => {
+      {Array.isArray(slices) ? slices.map((s, i) => {
         const dash = (s.value / total) * circ;
         const el = <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth="14"
           strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={-offset}
@@ -180,10 +180,10 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2 mb-3"><span className="material-icons text-yellow-400">warning</span>
               <h3 className="font-bold text-yellow-300">Alertas ({notifications.length})</h3></div>
             {notifications.length === 0 ? <p className="text-sm" style={{ color: t.textMuted }}>Sin alertas.</p> :
-              <ul className="space-y-2">{notifications.map((n, i) => (
+              <ul className="space-y-2">{Array.isArray(notifications) ? notifications.map((n, i) => (
                 <li key={i} className="text-sm text-yellow-200 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-yellow-400 flex-shrink-0" />{n.msg}
-                </li>))}</ul>}
+                </li>)) : null}</ul>}
           </div>
         )}
 
@@ -214,7 +214,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{ background: c }} /><span style={{ color: t.textMuted }}>{l}</span></div>
                   <span className="font-bold" style={{ color: t.text }}>{v}</span>
                 </div>
-              ))}
+              )) : null}
             </div>
           </div>
         </div>
@@ -236,7 +236,7 @@ export default function DashboardPage() {
                   color: filter === val ? (val === "completada" ? "#4ade80" : val === "en curso" ? "#fb923c" : t.accent) : t.textMuted }}>
                 {label}
               </button>
-            ))}
+            )) : null}
           </div>
           <select value={sortBy} onChange={e => setSortBy(e.target.value)}
             className="px-3 py-2.5 rounded-xl text-xs outline-none"
@@ -260,7 +260,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {paginated.map(task => (
+            {Array.isArray(paginated) ? paginated.map(task => (
               <div key={task._id} id={`task-${task._id}`}
                 className="rounded-2xl p-5 border transition-all"
                 style={{ background: task.status === "completada" ? `linear-gradient(135deg,#052e16,${t.bgCard})` : t.bgCard, border: `1px solid ${task.status === "completada" ? "#166534" : t.border}` }}>
@@ -294,7 +294,7 @@ export default function DashboardPage() {
                       <span style={{ color: t.textMuted }}>{k}</span>
                       <span className="font-medium truncate" style={{ color: t.text }}>{v}</span>
                     </div>
-                  ))}
+                  )) : null}
                 </div>
 
                 {task.repairDescription && (
@@ -327,14 +327,14 @@ export default function DashboardPage() {
                   )}
                 </div>
               </div>
-            ))}
+            )) : null}
           </div>
         )}
 
         {/* Paginación */}
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-8">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1}
+            <button onClick={() => setCurrentPage(p => Math.max(1, p-1)) : null} disabled={currentPage === 1}
               className="px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-30"
               style={{ background: t.bgSecondary, color: t.textMuted }}>← Anterior</button>
             {Array.from({ length: totalPages }, (_, i) => i+1).map(p => (
@@ -343,8 +343,8 @@ export default function DashboardPage() {
                 style={{ background: p === currentPage ? `linear-gradient(135deg,${t.accent},${t.accentSecondary})` : t.bgSecondary, color: p === currentPage ? "#fff" : t.textMuted }}>
                 {p}
               </button>
-            ))}
-            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages}
+            )) : null}
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1)) : null} disabled={currentPage === totalPages}
               className="px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-30"
               style={{ background: t.bgSecondary, color: t.textMuted }}>Siguiente →</button>
           </div>
