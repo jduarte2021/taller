@@ -5,6 +5,14 @@ import jwt from 'jsonwebtoken';
 import {TOKEN_SECRET} from '../config.js'
 import { createLog } from './log.controller.js';
 
+// CRÍTICO: SameSite=None + Secure=true para cookies cross-domain (Vercel → Render)
+const cookieOptions = {
+  httpOnly: true,
+  secure: true,          // HTTPS obligatorio en producción
+  sameSite: 'none',      // Permite envío cross-site
+  maxAge: 24 * 60 * 60 * 1000,
+};
+
 export const register = async (req, res) => {
     const {email, password, username, nombres, apellidos, cargo } = req.body
     try {
@@ -15,7 +23,7 @@ export const register = async (req, res) => {
         const newUser = new User({ username, email, password: passwordHash, nombres, apellidos, cargo })
         const userSaved = await newUser.save()
         const token = await createAccessToken({id: userSaved._id})
-        res.cookie('token', token);
+        res.cookie('token', token, cookieOptions);
         await createLog('REGISTER', `Nuevo usuario registrado: ${username} (${email})`, userSaved._id, username, req.ip);
         res.json({ id: userSaved._id, username: userSaved.username, nombres: userSaved.nombres, apellidos: userSaved.apellidos, cargo: userSaved.cargo, email: userSaved.email })
     } catch (error) { res.status(500).json({message: error.message}); }
@@ -29,14 +37,14 @@ export const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, userFound.password);
         if (!isMatch) return res.status(400).json({message: "Datos Incorrectos"});
         const token = await createAccessToken({id: userFound._id});
-        res.cookie('token', token);
+        res.cookie('token', token, cookieOptions);
         await createLog('LOGIN', `Usuario ${userFound.username} inició sesión`, userFound._id, userFound.username, req.ip);
         res.json({ id: userFound._id, username: userFound.username, nombres: userFound.nombres, apellidos: userFound.apellidos, cargo: userFound.cargo, email: userFound.email, profileImage: userFound.profileImage })
     } catch (error) { res.status(500).json({message: error.message}); }
 };
 
 export const logout = (req, res) => {
-    res.cookie('token', "", { expires: new Date(0) })
+    res.cookie('token', "", { ...cookieOptions, maxAge: 0 });
     return res.sendStatus(200);
 };
 
@@ -66,7 +74,6 @@ export const getUsers = async (req, res) => {
     } catch (error) { res.status(500).json({ message: "Error interno del servidor" }); }
 };
 
-// Register by admin (no token cookie, just response)
 export const registerByAdmin = async (req, res) => {
     const {email, password, username, nombres, apellidos, cargo } = req.body
     try {
