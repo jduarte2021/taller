@@ -83,7 +83,19 @@ export default function TaskFormPage() {
   const is = { background: t.input, border: `1px solid ${t.inputBorder}`, color: t.text };
 
   useEffect(() => {
-    axios.get("/api/users", { withCredentials: true }).then(r => setUsers(r.data)).catch(() => {});
+    axios.get("/api/users", { withCredentials: true })
+      .then(r => {
+        const data = Array.isArray(r.data)
+          ? r.data
+          : Array.isArray(r.data?.users)
+            ? r.data.users
+            : [];
+
+        setUsers(data);
+      })
+      .catch(() => {
+        setUsers([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -334,7 +346,11 @@ export default function TaskFormPage() {
                 <Field label="Mecánico / Personal Asignado" error={errors.assignedTo && "Requerido"}>
                   <select {...register("assignedTo", { required: true })} className={inp} style={is}>
                     <option value="">Selecciona un usuario</option>
-                    {users.map(u => <option key={u._id} value={u._id}>{u.username || u.email}</option>)}
+                    {Array.isArray(users) && users.map(u => (
+                      <option key={u._id} value={u._id}>
+                        {u.username || u.email}
+                      </option>
+                    ))}
                   </select>
                 </Field>
               </div>
