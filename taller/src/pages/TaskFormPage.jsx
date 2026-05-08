@@ -83,7 +83,7 @@ export default function TaskFormPage() {
   const is = { background: t.input, border: `1px solid ${t.inputBorder}`, color: t.text };
 
   useEffect(() => {
-    axios.get("/api/users", { withCredentials: true }).then(r => setUsers(r.data)).catch(() => {});
+    axios.get("/users", { withCredentials: true }).then(r => setUsers(r.data)).catch(() => {});
   }, []);
 
   useEffect(() => {

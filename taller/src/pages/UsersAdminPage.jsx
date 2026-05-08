@@ -24,10 +24,10 @@ export default function UsersAdminPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("/api/users/all", { withCredentials: true });
+      const res = await axios.get("/users/all", { withCredentials: true });
       setUsers(res.data);
     } catch {
-      const res = await axios.get("/api/users", { withCredentials: true });
+      const res = await axios.get("/users", { withCredentials: true });
       setUsers(res.data);
     }
     setLoading(false);
@@ -37,7 +37,7 @@ export default function UsersAdminPage() {
 
   const handleRoleChange = async (userId, newCargo) => {
     try {
-      await axios.put(`/api/users/${userId}/role`, { cargo: newCargo }, { withCredentials: true });
+      await axios.put(`/users/${userId}/role`, { cargo: newCargo }, { withCredentials: true });
       Swal.fire({ title: "Rol actualizado", icon: "success", background: t.bgCard, color: t.text, timer: 1500, showConfirmButton: false });
       fetchUsers();
     } catch {
@@ -60,7 +60,7 @@ export default function UsersAdminPage() {
     });
     if (!result.isConfirmed) return;
     try {
-      await axios.delete(`/api/users/${u._id}`, { withCredentials: true });
+      await axios.delete(`/users/${u._id}`, { withCredentials: true });
       Swal.fire({ title: "Usuario eliminado", icon: "success", background: t.bgCard, color: t.text, timer: 1500, showConfirmButton: false });
       fetchUsers();
     } catch (err) {
@@ -76,7 +76,7 @@ export default function UsersAdminPage() {
     }
     setSaving(true);
     try {
-      await axios.post("/api/register-admin", form, { withCredentials: true });
+      await axios.post("/register-admin", form, { withCredentials: true });
       Swal.fire({ title: "¡Usuario creado!", text: `${form.nombres} ${form.apellidos} registrado como ${form.cargo}`, icon: "success", background: t.bgCard, color: t.text });
       setForm({ username: "", email: "", password: "", nombres: "", apellidos: "", cargo: "Mecánico" });
       fetchUsers();

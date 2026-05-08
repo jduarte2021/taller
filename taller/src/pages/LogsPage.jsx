@@ -32,7 +32,7 @@ export default function LogsPage() {
   const fetchLogs = async (p = 1) => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/logs?page=${p}&limit=50`, { withCredentials: true });
+      const res = await axios.get(`/logs?page=${p}&limit=50`, { withCredentials: true });
       setLogs(res.data.logs);
       setTotalPages(res.data.pages);
     } catch (e) { console.error(e); }

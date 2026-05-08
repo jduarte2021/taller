@@ -37,10 +37,10 @@ export default function TaskSearchPage() {
     try {
       let res;
       const populate = ".populate('assignedTo','nombres apellidos')";
-      if (type === "plate")  res = await axios.get(`/api/tasks/search?carPlate=${v.toUpperCase()}`);
-      else if (type === "name")  res = await axios.get(`/api/tasks/search/name?clientName=${encodeURIComponent(v)}`);
-      else if (type === "order") res = await axios.get(`/api/tasks/search/order?orderNumber=${v}`);
-      else if (type === "phone") res = await axios.get(`/api/tasks/search/phone?phone=${encodeURIComponent(v)}`);
+      if (type === "plate")  res = await axios.get(`/tasks/search?carPlate=${v.toUpperCase()}`);
+      else if (type === "name")  res = await axios.get(`/tasks/search/name?clientName=${encodeURIComponent(v)}`);
+      else if (type === "order") res = await axios.get(`/tasks/search/order?orderNumber=${v}`);
+      else if (type === "phone") res = await axios.get(`/tasks/search/phone?phone=${encodeURIComponent(v)}`);
       setTasks(res.data);
       sessionStorage.setItem("taskSearchParams", JSON.stringify({ type, value: v }));
     } catch (err) {
@@ -54,13 +54,13 @@ export default function TaskSearchPage() {
       showCancelButton:true, confirmButtonColor:"#ef4444", cancelButtonColor:t.bgSecondary,
       confirmButtonText:"Sí, eliminar", cancelButtonText:"Cancelar" });
     if (!r.isConfirmed) return;
-    await axios.delete(`/api/tasks/${taskId}`, { withCredentials: true });
+    await axios.delete(`/tasks/${taskId}`, { withCredentials: true });
     setTasks(prev => prev.filter(tk => tk._id !== taskId));
     Swal.fire({ title:"Eliminado", icon:"success", background:t.bgCard, color:t.text, timer:1500, showConfirmButton:false });
   };
 
   const handleComplete = async (taskId) => {
-    await axios.put(`/api/tasks/${taskId}/complete`, {}, { withCredentials: true });
+    await axios.put(`/tasks/${taskId}/complete`, {}, { withCredentials: true });
     setTasks(prev => prev.map(tk => tk._id === taskId ? {...tk, status:"completada"} : tk));
     Swal.fire({ title:"¡Completada!", icon:"success", background:t.bgCard, color:t.text, timer:1500, showConfirmButton:false });
   };
@@ -105,7 +105,7 @@ Quedamos a su disposición.
 TallerData — Software para Taller Mecánico`;
 
     try {
-      await axios.post("/api/email/send", {
+      await axios.post("/email/send", {
         to: task.clientEmail,
         subject: `Presupuesto TallerData — Orden #${task.orderNumber}`,
         message: msg,

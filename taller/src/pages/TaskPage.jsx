@@ -48,7 +48,7 @@ export default function TaskPage() {
   };
 
   const handleComplete = async (id) => {
-    try { await axios.put(`/api/tasks/${id}/complete`); Swal.fire({title:"¡Completada!",icon:"success",background:t.bgCard,color:t.text,timer:1500,showConfirmButton:false}); getTasks(); }
+    try { await axios.put(`/tasks/${id}/complete`); Swal.fire({title:"¡Completada!",icon:"success",background:t.bgCard,color:t.text,timer:1500,showConfirmButton:false}); getTasks(); }
     catch { Swal.fire({title:"Error",icon:"error",background:t.bgCard,color:t.text}); }
   };
 
@@ -77,7 +77,7 @@ export default function TaskPage() {
     if (mensaje === undefined) return;
     const msg = `Estimado/a ${task.clientNombres} ${task.clientApellidos},\n\nLe enviamos el presupuesto para su vehículo ${task.carBrand} ${task.carModel} (${task.carPlate}):\n\nMotivo: ${task.motivoIngreso || task.repairDescription || "Servicio de taller"}\n\n— Precio neto:  ${fmt(neto)}\n— IVA (19%):    ${fmt(iva)}\n— TOTAL:        ${fmt(total)}\n${mensaje ? `\nObservaciones: ${mensaje}` : ""}\n\nQuedamos a su disposición.\nTallerData — Software para Taller Mecánico`;
     try {
-      await axios.post("/api/email/send", { to: task.clientEmail, subject: `Presupuesto TallerData — Orden #${task.orderNumber}`, message: msg }, { withCredentials: true });
+      await axios.post("/email/send", { to: task.clientEmail, subject: `Presupuesto TallerData — Orden #${task.orderNumber}`, message: msg }, { withCredentials: true });
       Swal.fire({ title:"¡Presupuesto enviado!", icon:"success", background:t.bgCard, color:t.text, timer:2000, showConfirmButton:false });
     } catch (err) {
       Swal.fire({ title:"Error al enviar", text: err.response?.data?.message || "Verifica configuración SMTP", icon:"error", background:t.bgCard, color:t.text });

@@ -64,7 +64,7 @@ export function TaskProvider({ children }) {
     const deleteTask = async (taskId) => {
         try {
             await axios.delete(
-                `http://localhost:3000/api/tasks/${taskId}`,
+                `/tasks/${taskId}`,
                 {
                     withCredentials: true, // Enviar cookies con la solicitud
                 }
@@ -78,7 +78,7 @@ export function TaskProvider({ children }) {
     const updateTask = async (taskId, updatedData) => {
         try {
             await axios.put(
-                `http://localhost:3000/api/tasks/${taskId}`,
+                `/tasks/${taskId}`,
                 updatedData,
                 {
                     withCredentials: true, // Incluir cookies con la solicitud

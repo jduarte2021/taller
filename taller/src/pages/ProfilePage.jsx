@@ -38,7 +38,7 @@ export default function ProfilePage() {
     if (profileImage) data.append("profileImage", profileImage);
 
     try {
-      const res = await axios.put("/api/profile", data, {
+      const res = await axios.put("/profile", data, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });

@@ -35,7 +35,7 @@ export default function ClientsPage() {
     if (!emailMsg.trim()) return;
     setSending(true);
     try {
-      await axios.post("/api/email/send", { to: selected.email, subject: emailSubject, message: emailMsg }, { withCredentials: true });
+      await axios.post("/email/send", { to: selected.email, subject: emailSubject, message: emailMsg }, { withCredentials: true });
       Swal.fire({ title: "¡Correo enviado!", text: `Email enviado a ${selected.email}`, icon: "success", background: t.bgCard, color: t.text, timer: 2000, showConfirmButton: false });
       setEmailMsg("");
     } catch (err) {

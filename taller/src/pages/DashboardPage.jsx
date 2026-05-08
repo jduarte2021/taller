@@ -141,7 +141,7 @@ export default function DashboardPage() {
 
   const handleComplete = async (id) => {
     try {
-      await axios.put(`/api/tasks/${id}/complete`);
+      await axios.put(`/tasks/${id}/complete`);
       Swal.fire({ title: "¡Completada!", icon: "success", background: t.bgCard, color: t.text });
       getTasks();
     } catch { Swal.fire({ title: "Error", icon: "error", background: t.bgCard, color: t.text }); }
