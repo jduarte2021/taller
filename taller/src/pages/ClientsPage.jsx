@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTask } from "../context/TaskContext";
 import { useTheme } from "../context/ThemeContext";
-import axios from "axios";
+import axios from "../api/axios";
 import Swal from "sweetalert2";
 
 export default function ClientsPage() {

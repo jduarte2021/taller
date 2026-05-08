@@ -4,7 +4,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import axios from "axios";
+import axios from "../api/axios";
 import { generateOrderPDF } from "../utils/pdfGenerator.js";
 
 function BarChart({ data, color }) {

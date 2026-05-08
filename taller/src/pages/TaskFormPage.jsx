@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTask } from "../context/TaskContext";
 import { useTheme } from "../context/ThemeContext";
 import { carBrands } from "../components/carBrands.jsx";
-import axios from "axios";
+import axios from "../api/axios";
 
 // ── Validador RUT chileno ─────────────────────────────────────────────────────
 function validarRUT(rut) {

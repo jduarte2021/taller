@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { createTaskRequest, getTasksRequest } from "../api/task";
-import axios from "axios";
+import axios from "../api/axios";
 
 const TaskContext = createContext();
 

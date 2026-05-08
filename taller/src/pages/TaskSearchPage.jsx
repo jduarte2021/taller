@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../context/AuthContext";
