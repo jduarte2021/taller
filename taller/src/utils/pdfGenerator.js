@@ -1,33 +1,22 @@
-/**
- * PDF Generator - TallerData
- * Delega la generación al backend (Puppeteer).
- * El frontend solo envía los datos y descarga el archivo resultante.
- */
+import axios from "../api/axios";
+
 export async function generateOrderPDF(task) {
   try {
-    const response = await fetch("/api/pdf/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(task),
+    const response = await axios.post("/pdf/order", task, {
+      responseType: "blob",
+      withCredentials: true,
     });
-
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.message || `Error ${response.status}`);
-    }
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+    const clientName = `${task.clientNombres || ""}_${task.clientApellidos || ""}`.trim().replace(/\s+/g, "_") || "cliente";
     const a = document.createElement("a");
     a.href = url;
-    a.download = `orden_${task.orderNumber}_${(task.clientName || "cliente").replace(/\s+/g, "_")}.pdf`;
+    a.download = `orden_${task.orderNumber}_${clientName}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error("Error descargando PDF:", error);
-    alert("Error al generar el PDF: " + error.message);
+    alert("Error al generar el PDF: " + (error.response?.data?.message || error.message));
   }
 }
