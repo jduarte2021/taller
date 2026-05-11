@@ -1,4 +1,4 @@
-import axios from "../api/axios";
+import axios from "axios";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -38,12 +38,14 @@ export default function ProfilePage() {
     if (profileImage) data.append("profileImage", profileImage);
 
     try {
-      const res = await axios.put("/profile", data, {
+      const res = await axios.put("/api/profile", data, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
       updateUserProfile(res.data);
-      setProfileImage(null);
+      setProfileImage(null); // Clear so previewSrc recalculates from updated user.profileImage
+      // Force re-render by updating formData with fresh data
+      setFormData(prev => ({ ...prev, nombre: res.data.nombres, apellido: res.data.apellidos, cargo: res.data.cargo }));
       Swal.fire({ title: "¡Perfil actualizado!", icon: "success", background: t.bgCard, color: t.text, timer: 1500, showConfirmButton: false });
     } catch (error) {
       console.error("Error:", error.response?.data);
@@ -52,7 +54,7 @@ export default function ProfilePage() {
     setSaving(false);
   };
 
-  const BACKEND = "https://taller-8qh1.onrender.com";
+  const BACKEND = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace("/api","") : "http://localhost:3000";
   const previewSrc = profileImage
     ? URL.createObjectURL(profileImage)
     : user?.profileImage

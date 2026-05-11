@@ -28,7 +28,7 @@ export default function ClientsPage() {
   const filtered = useMemo(() => {
     if (!search.trim()) return clients;
     const q = search.toLowerCase();
-    return clients.filter(c => (`${task.clientNombres} ${task.clientApellidos}`).toLowerCase().includes(q) || c.rut.toLowerCase().includes(q) || c.phone.includes(q) || c.email.toLowerCase().includes(q) || c.orders.some(o => o.orderNumber?.toString().includes(q)));
+    return clients.filter(c => c.name.toLowerCase().includes(q) || c.rut.toLowerCase().includes(q) || c.phone.includes(q) || c.email.toLowerCase().includes(q) || c.orders.some(o => o.orderNumber?.toString().includes(q)));
   }, [clients, search]);
 
   const handleSendEmail = async () => {
