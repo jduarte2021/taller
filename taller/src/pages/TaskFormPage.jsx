@@ -136,19 +136,21 @@ export default function TaskFormPage() {
   };
 
   const onSubmit = async (data) => {
-    // Solo Nombres, Apellidos y Patente son obligatorios
+    // Validar campos obligatorios: solo Nombres, Apellidos y Patente
     const missing = [];
     if (!data.clientNombres?.trim()) missing.push("Nombres del cliente");
     if (!data.clientApellidos?.trim()) missing.push("Apellidos del cliente");
     if (!data.carPlate?.trim()) missing.push("Patente del vehículo");
+
     if (missing.length > 0) {
       Swal.fire({
-        title: "Campos obligatorios incompletos",
-        html: `<ul style="text-align:left;padding-left:20px;margin-top:8px;">${missing.map(m => `<li style="margin-bottom:4px;">• ${m}</li>`).join("")}</ul>`,
+        title: "Faltan campos obligatorios",
+        html: `<div style="text-align:left;margin-top:8px;">${missing.map(m => `<div style="padding:6px 0;border-bottom:1px solid #334155;font-size:14px;">⚠️ ${m}</div>`).join("")}</div>`,
         icon: "warning",
         confirmButtonText: "Entendido",
         background: "#0f172a",
         color: "#f1f5f9",
+        confirmButtonColor: "#38bdf8",
       });
       return;
     }
@@ -208,7 +210,7 @@ export default function TaskFormPage() {
               </Field>
 
               {/* RUT con validación */}
-              <Field label="RUT" error={errors.clientRUT?.message || ""}>
+              <Field label="RUT" >
                 <div className="relative">
                   <input
                     {...register("clientRUT")}
@@ -327,7 +329,7 @@ export default function TaskFormPage() {
                   placeholder="Observaciones adicionales..." className={inp} style={is} />
               </Field>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Precio del Servicio (CLP)" error={errors.servicePrice?.message || ""}>
+                <Field label="Precio del Servicio (CLP)" >
                   <input type="number" step="1" placeholder="85000"
                     {...register("servicePrice", { min: { value: 0, message: "No puede ser negativo" } })}
                     className={inp} style={is} />
