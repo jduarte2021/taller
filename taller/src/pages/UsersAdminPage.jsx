@@ -27,7 +27,7 @@ export default function UsersAdminPage() {
       const res = await axios.get("/users/all", { withCredentials: true });
       setUsers(res.data);
     } catch {
-      const res = await axios.get("/users", { withCredentials: true });
+      const res = await axios.get("/api/users", { withCredentials: true });
       setUsers(res.data);
     }
     setLoading(false);
@@ -65,6 +65,29 @@ export default function UsersAdminPage() {
       fetchUsers();
     } catch (err) {
       Swal.fire({ title: "Error", text: err.response?.data?.message || "No se pudo eliminar", icon: "error", background: t.bgCard, color: t.text });
+    }
+  };
+
+  const handleChangePassword = async (u) => {
+    const { value: newPassword } = await Swal.fire({
+      title: `Cambiar contraseña de ${u.nombres} ${u.apellidos}`,
+      input: "password",
+      inputLabel: "Nueva contraseña (mínimo 6 caracteres)",
+      inputPlaceholder: "••••••••",
+      inputAttributes: { minlength: 6, autocomplete: "new-password" },
+      showCancelButton: true,
+      confirmButtonText: "Guardar",
+      cancelButtonText: "Cancelar",
+      background: t.bgCard,
+      color: t.text,
+      inputValidator: (v) => (!v || v.length < 6) ? "Mínimo 6 caracteres" : null,
+    });
+    if (!newPassword) return;
+    try {
+      await axios.put(`/users/${u._id}/password`, { newPassword }, { withCredentials: true });
+      Swal.fire({ title: "¡Contraseña actualizada!", icon: "success", background: t.bgCard, color: t.text, timer: 1500, showConfirmButton: false });
+    } catch (err) {
+      Swal.fire({ title: "Error", text: err.response?.data?.message || "No se pudo actualizar", icon: "error", background: t.bgCard, color: t.text });
     }
   };
 
@@ -151,13 +174,22 @@ export default function UsersAdminPage() {
                             )}
                           </td>
                           <td className="px-4 py-3">
+                            <div className="flex gap-2 items-center flex-wrap">
+                            {(isAdmin) && (
+                              <button onClick={() => handleChangePassword(u)}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80"
+                                style={{ background:`${t.accent}20`, color:t.accent }}>
+                                <span className="material-icons text-sm">lock_reset</span> Contraseña
+                              </button>
+                            )}
                             {!isMe && !isSA && (
                               <button onClick={() => handleDelete(u)}
-                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-80"
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80"
                                 style={{ background:"#450a0a", color:"#f87171" }}>
                                 <span className="material-icons text-sm">delete</span> Eliminar
                               </button>
                             )}
+                          </div>
                           </td>
                         </>
                       )}

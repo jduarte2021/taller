@@ -133,7 +133,11 @@ export const AuthProvider = ({ children }) => {
                 };
                 setUser(userData);
                 setIsAuthenticated(true);
-            } catch {
+            } catch (error) {
+                // 401 = sin sesión (normal), no mostrar en consola
+                if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+                    console.warn("Error verificando sesión:", error?.message);
+                }
                 setIsAuthenticated(false);
                 setUser(null);
                 localStorage.removeItem("tallerdata_user");
