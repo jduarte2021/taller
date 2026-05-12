@@ -5,7 +5,6 @@ import { useTask } from "../context/TaskContext";
 import { useTheme } from "../context/ThemeContext";
 import { carBrands } from "../components/carBrands.jsx";
 import axios from "../api/axios";
-import Swal from "sweetalert2";
 
 // ── Validador RUT chileno ─────────────────────────────────────────────────────
 function validarRUT(rut) {
@@ -84,7 +83,7 @@ export default function TaskFormPage() {
   const is = { background: t.input, border: `1px solid ${t.inputBorder}`, color: t.text };
 
   useEffect(() => {
-    axios.get("/api/users", { withCredentials: true }).then(r => setUsers(r.data)).catch(() => {});
+    axios.get("/users", { withCredentials: true }).then(r => setUsers(r.data)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -136,24 +135,6 @@ export default function TaskFormPage() {
   };
 
   const onSubmit = async (data) => {
-    // Validar campos obligatorios: solo Nombres, Apellidos y Patente
-    const missing = [];
-    if (!data.clientNombres?.trim()) missing.push("Nombres del cliente");
-    if (!data.clientApellidos?.trim()) missing.push("Apellidos del cliente");
-    if (!data.carPlate?.trim()) missing.push("Patente del vehículo");
-
-    if (missing.length > 0) {
-      Swal.fire({
-        title: "Faltan campos obligatorios",
-        html: `<div style="text-align:left;margin-top:8px;">${missing.map(m => `<div style="padding:6px 0;border-bottom:1px solid #334155;font-size:14px;">⚠️ ${m}</div>`).join("")}</div>`,
-        icon: "warning",
-        confirmButtonText: "Entendido",
-        background: "#0f172a",
-        color: "#f1f5f9",
-        confirmButtonColor: "#38bdf8",
-      });
-      return;
-    }
     // Validar RUT antes de enviar
     if (!validarRUT(data.clientRUT)) {
       setError("clientRUT", { type: "manual", message: "RUT inválido — verifica el número" });
@@ -210,10 +191,10 @@ export default function TaskFormPage() {
               </Field>
 
               {/* RUT con validación */}
-              <Field label="RUT" >
+              <Field label="RUT" error={errors.clientRUT?.message}>
                 <div className="relative">
                   <input
-                    {...register("clientRUT")}
+                    {...register("clientRUT", { required: "Requerido" })}
                     value={rutValue}
                     onChange={handleRutChange}
                     placeholder="12.345.678-9"
@@ -245,19 +226,19 @@ export default function TaskFormPage() {
               </Field>
 
               {/* Teléfono */}
-              <Field label="Teléfono" >
+              <Field label="Teléfono" error={errors.clientPhone && "Requerido"}>
                 <input
-                  {...register("clientPhone")}
+                  {...register("clientPhone", { required: true })}
                   placeholder="+56 9 1234 5678"
                   className={inp} style={is}
                 />
               </Field>
 
               {/* Email */}
-              <Field label="Email" >
+              <Field label="Email" error={errors.clientEmail && "Requerido"}>
                 <input
                   type="email"
-                  {...register("clientEmail")}
+                  {...register("clientEmail", { required: true })}
                   placeholder="correo@ejemplo.com"
                   className={inp} style={is}
                 />
@@ -272,8 +253,8 @@ export default function TaskFormPage() {
                 <input {...register("carPlate", { required: true })} placeholder="ABCD12"
                   className={inp} style={{ ...is, textTransform: "uppercase" }} />
               </Field>
-              <Field label="Marca" >
-                <select {...register("carBrand")} className={inp} style={is}>
+              <Field label="Marca" error={errors.carBrand && "Requerido"}>
+                <select {...register("carBrand", { required: true })} className={inp} style={is}>
                   <option value="">Selecciona una marca</option>
                   {carBrands.map((b, i) => <option key={i} value={b}>{b}</option>)}
                 </select>
@@ -284,12 +265,12 @@ export default function TaskFormPage() {
                     onChange={e => setCustomBrand(e.target.value)} className={inp} style={is} />
                 </Field>
               )}
-              <Field label="Modelo" >
-                <input {...register("carModel")} placeholder="Corolla, Civic, etc."
+              <Field label="Modelo" error={errors.carModel && "Requerido"}>
+                <input {...register("carModel", { required: true })} placeholder="Corolla, Civic, etc."
                   className={inp} style={is} />
               </Field>
-              <Field label="Color" >
-                <input {...register("carColor")} placeholder="Color del vehículo"
+              <Field label="Color" error={errors.carColor && "Requerido"}>
+                <input {...register("carColor", { required: true })} placeholder="Color del vehículo"
                   className={inp} style={is} />
               </Field>
               <Field label="Año">
@@ -312,16 +293,16 @@ export default function TaskFormPage() {
           {/* ── Datos de la orden ── */}
           <Section icon="build" title="Datos de la Orden">
             <div className="space-y-4">
-              <Field label="Motivo de Ingreso" >
-                <textarea {...register("motivoIngreso")} rows={3}
+              <Field label="Motivo de Ingreso" error={errors.motivoIngreso && "Requerido"}>
+                <textarea {...register("motivoIngreso", { required: true })} rows={3}
                   placeholder="¿Por qué ingresa el vehículo al taller?" className={inp} style={is} />
               </Field>
               <Field label="Diagnóstico Taller">
                 <textarea {...register("diagnosticoTaller")} rows={3}
                   placeholder="Diagnóstico técnico del taller..." className={inp} style={is} />
               </Field>
-              <Field label="Descripción de la Reparación / Cambio de Piezas" >
-                <textarea {...register("repairDescription")} rows={3}
+              <Field label="Descripción de la Reparación / Cambio de Piezas" error={errors.repairDescription && "Requerido"}>
+                <textarea {...register("repairDescription", { required: true })} rows={3}
                   placeholder="Detalle de trabajos, repuestos y piezas utilizadas..." className={inp} style={is} />
               </Field>
               <Field label="Observaciones Generales">
@@ -329,9 +310,9 @@ export default function TaskFormPage() {
                   placeholder="Observaciones adicionales..." className={inp} style={is} />
               </Field>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Precio del Servicio (CLP)" >
+                <Field label="Precio del Servicio (CLP)" error={errors.servicePrice?.message}>
                   <input type="number" step="1" placeholder="85000"
-                    {...register("servicePrice", { min: { value: 0, message: "No puede ser negativo" } })}
+                    {...register("servicePrice", { required: "Requerido", min: { value: 0, message: "No puede ser negativo" } })}
                     className={inp} style={is} />
                   {watch("servicePrice") > 0 && (
                     <div className="mt-2 p-2.5 rounded-lg text-xs space-y-1" style={{ background: t.bgSecondary }}>
@@ -350,8 +331,8 @@ export default function TaskFormPage() {
                     </div>
                   )}
                 </Field>
-                <Field label="Mecánico / Personal Asignado" >
-                  <select {...register("assignedTo")} className={inp} style={is}>
+                <Field label="Mecánico / Personal Asignado" error={errors.assignedTo && "Requerido"}>
+                  <select {...register("assignedTo", { required: true })} className={inp} style={is}>
                     <option value="">Selecciona un usuario</option>
                     {users.map(u => <option key={u._id} value={u._id}>{u.username || u.email}</option>)}
                   </select>
