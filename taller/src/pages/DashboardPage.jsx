@@ -9,15 +9,33 @@ import { generateOrderPDF } from "../utils/pdfGenerator.js";
 
 function BarChart({ data, color }) {
   const max = Math.max(...data.map(d => d.value), 1);
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setAnimated(true), 100); return () => clearTimeout(t); }, []);
+  const colW = 200 / data.length;
   return (
-    <svg viewBox="0 0 200 60" className="w-full h-16">
+    <svg viewBox="0 0 200 80" className="w-full h-24">
+      <style>{`
+        .bar-rect { transition: height 0.8s cubic-bezier(.4,0,.2,1), y 0.8s cubic-bezier(.4,0,.2,1); }
+      `}</style>
       {data.map((d, i) => {
-        const h = Math.max(4, (d.value / max) * 52);
-        const x = i * (200 / data.length) + 4;
+        const fullH = Math.max(4, (d.value / max) * 58);
+        const h = animated ? fullH : 0;
+        const x = i * colW + 3;
         return (
           <g key={i}>
-            <rect x={x} y={60 - h} width={200 / data.length - 8} height={h} rx="3" fill={color} opacity="0.85" />
-            <text x={x + (200 / data.length - 8) / 2} y={58} textAnchor="middle" fontSize="7" fill="#94a3b8">{d.label}</text>
+            <rect className="bar-rect" x={x} y={70 - h} width={colW - 6} height={h} rx="4"
+              fill={color} opacity="0.9" />
+            {d.value > 0 && (
+              <text x={x + (colW - 6) / 2} y={70 - fullH - 3} textAnchor="middle"
+                fontSize="8" fontWeight="bold" fill={color} opacity={animated ? 1 : 0}
+                style={{ transition: "opacity 0.5s ease 0.6s" }}>
+                {d.value}
+              </text>
+            )}
+            <text x={x + (colW - 6) / 2} y={78} textAnchor="middle"
+              fontSize="9" fontWeight="600" fill="#94a3b8">
+              {d.label}
+            </text>
           </g>
         );
       })}
@@ -27,28 +45,45 @@ function BarChart({ data, color }) {
 
 function DonutChart({ slices }) {
   const total = slices.reduce((s, c) => s + c.value, 0) || 1;
-  let offset = 0;
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setAnimated(true), 200); return () => clearTimeout(t); }, []);
   const r = 38, cx = 50, cy = 50, circ = 2 * Math.PI * r;
+  let offset = 0;
   return (
-    <svg viewBox="0 0 100 100" className="w-28 h-28">
+    <svg viewBox="0 0 100 100" className="w-32 h-32">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth="14" />
       {slices.map((s, i) => {
-        const dash = (s.value / total) * circ;
-        const el = <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth="14"
-          strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={-offset}
-          strokeLinecap="round" transform={`rotate(-90 ${cx} ${cy})`} />;
-        offset += dash; return el;
+        const dash = animated ? (s.value / total) * circ : 0;
+        const el = (
+          <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth="14"
+            strokeDasharray={`${dash} ${circ - dash}`}
+            strokeDashoffset={-offset}
+            strokeLinecap="round"
+            transform={`rotate(-90 ${cx} ${cy})`}
+            style={{ transition: `stroke-dasharray 1s cubic-bezier(.4,0,.2,1) ${i * 0.2}s` }}
+          />
+        );
+        offset += (s.value / total) * circ;
+        return el;
       })}
-      <text x={cx} y={cy + 5} textAnchor="middle" fontSize="12" fontWeight="bold" fill="#f1f5f9">{total}</text>
-      <text x={cx} y={cy + 16} textAnchor="middle" fontSize="6" fill="#94a3b8">total</text>
+      <text x={cx} y={cy + 5} textAnchor="middle" fontSize="14" fontWeight="bold" fill="#f1f5f9">{total}</text>
+      <text x={cx} y={cy + 17} textAnchor="middle" fontSize="8" fill="#94a3b8">total</text>
     </svg>
   );
 }
 
 function KPICard({ icon, label, value, sub, accent, t }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { const tm = setTimeout(() => setVisible(true), 80); return () => clearTimeout(tm); }, []);
   return (
     <div className="rounded-2xl p-5 flex flex-col gap-2 relative overflow-hidden"
-      style={{ background: `linear-gradient(135deg,${t.bgCard} 60%,${t.bgSecondary})`, border: `1px solid ${t.border}` }}>
+      style={{
+        background: `linear-gradient(135deg,${t.bgCard} 60%,${t.bgSecondary})`,
+        border: `1px solid ${t.border}`,
+        transform: visible ? "translateY(0)" : "translateY(16px)",
+        opacity: visible ? 1 : 0,
+        transition: "transform 0.5s cubic-bezier(.4,0,.2,1), opacity 0.5s ease",
+      }}>
       <div className="absolute inset-0 opacity-10 rounded-2xl"
         style={{ background: `radial-gradient(circle at 80% 20%, ${accent}, transparent 70%)` }} />
       <div className="z-10 text-2xl">{icon}</div>

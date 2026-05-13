@@ -64,7 +64,10 @@ export const createTask = async (req, res) => {
     try {
         const lastTask = await Task.findOne().sort({ orderNumber: -1 });
         const newOrderNumber = lastTask?.orderNumber ? lastTask.orderNumber + 1 : 1001;
-        const newTask = new Task({ ...req.body, user: req.user.id, createdBy: req.user.id, orderNumber: newOrderNumber });
+        // Sanitize assignedTo: empty string causes BSONError
+        const body = { ...req.body };
+        if (!body.assignedTo || body.assignedTo === "") body.assignedTo = null;
+        const newTask = new Task({ ...body, user: req.user.id, createdBy: req.user.id, orderNumber: newOrderNumber });
         const savedTask = await newTask.save();
         const populatedTask = await Task.findById(savedTask._id).populate("assignedTo", "nombres apellidos").populate("createdBy", "username");
         const u = await User.findById(req.user.id);
@@ -99,7 +102,9 @@ export const updateTask = async (req, res) => {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid task ID' });
     try {
-        const task = await Task.findByIdAndUpdate(id, { ...req.body, editedBy: req.user.id }, { new: true, runValidators: true })
+        const updateBody = { ...req.body, editedBy: req.user.id };
+        if (!updateBody.assignedTo || updateBody.assignedTo === "") updateBody.assignedTo = null;
+        const task = await Task.findByIdAndUpdate(id, updateBody, { new: true, runValidators: true })
             .populate('assignedTo', 'nombres apellidos').populate('createdBy', 'username').populate('editedBy', 'username');
         if (!task) return res.status(404).json({ message: 'Tarea no encontrada' });
         const u = await User.findById(req.user.id);
