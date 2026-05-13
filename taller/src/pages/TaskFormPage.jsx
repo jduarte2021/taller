@@ -136,12 +136,10 @@ export default function TaskFormPage() {
   };
 
   const onSubmit = async (data) => {
-    // Validar campos obligatorios
     const missing = [];
     if (!data.clientNombres?.trim()) missing.push("Nombres del cliente");
     if (!data.clientApellidos?.trim()) missing.push("Apellidos del cliente");
     if (!data.carPlate?.trim()) missing.push("Patente del vehículo");
-
     if (missing.length > 0) {
       await Swal.fire({
         title: "⚠️ Campos obligatorios faltantes",
@@ -153,7 +151,6 @@ export default function TaskFormPage() {
         background: "#0f172a",
         color: "#f1f5f9",
         confirmButtonColor: "#38bdf8",
-        customClass: { popup: "swal-wide" },
       });
       return;
     }
@@ -166,7 +163,6 @@ export default function TaskFormPage() {
     const finalData = {
       ...data,
       carBrand: selectedBrand === "Otro" ? customBrand : data.carBrand,
-      // Convert empty string to null so MongoDB doesn't try to cast "" as ObjectId
       assignedTo: data.assignedTo && data.assignedTo !== "" ? data.assignedTo : null,
     };
     if (id) await updateTask(id, finalData);
