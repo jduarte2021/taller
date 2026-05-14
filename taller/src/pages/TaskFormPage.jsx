@@ -154,8 +154,8 @@ export default function TaskFormPage() {
       });
       return;
     }
-    // Validar RUT antes de enviar
-    if (!validarRUT(data.clientRUT)) {
+    // Validar RUT solo si fue ingresado (no es obligatorio)
+    if (data.clientRUT && data.clientRUT.trim().length > 0 && !validarRUT(data.clientRUT)) {
       setError("clientRUT", { type: "manual", message: "RUT inválido — verifica el número" });
       return;
     }

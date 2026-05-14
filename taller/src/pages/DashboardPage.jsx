@@ -10,30 +10,35 @@ import { generateOrderPDF } from "../utils/pdfGenerator.js";
 function BarChart({ data, color }) {
   const max = Math.max(...data.map(d => d.value), 1);
   const [animated, setAnimated] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setAnimated(true), 100); return () => clearTimeout(t); }, []);
-  const colW = 200 / data.length;
+  useEffect(() => { const tm = setTimeout(() => setAnimated(true), 150); return () => clearTimeout(tm); }, []);
+  const colW = 300 / data.length;
   return (
-    <svg viewBox="0 0 200 80" className="w-full h-24">
-      <style>{`
-        .bar-rect { transition: height 0.8s cubic-bezier(.4,0,.2,1), y 0.8s cubic-bezier(.4,0,.2,1); }
-      `}</style>
+    <svg viewBox="0 0 300 110" className="w-full h-40">
       {data.map((d, i) => {
-        const fullH = Math.max(4, (d.value / max) * 58);
+        const fullH = Math.max(6, (d.value / max) * 72);
         const h = animated ? fullH : 0;
-        const x = i * colW + 3;
+        const x = i * colW + 4;
+        const barW = colW - 8;
         return (
           <g key={i}>
-            <rect className="bar-rect" x={x} y={70 - h} width={colW - 6} height={h} rx="4"
-              fill={color} opacity="0.9" />
+            {/* Background track */}
+            <rect x={x} y={12} width={barW} height={72} rx="5" fill="rgba(255,255,255,0.04)" />
+            {/* Animated bar */}
+            <rect x={x} y={84 - h} width={barW} height={h} rx="5"
+              fill={color} opacity="0.88"
+              style={{ transition: `y 0.9s cubic-bezier(.4,0,.2,1) ${i*0.06}s, height 0.9s cubic-bezier(.4,0,.2,1) ${i*0.06}s` }}
+            />
+            {/* Value on top */}
             {d.value > 0 && (
-              <text x={x + (colW - 6) / 2} y={70 - fullH - 3} textAnchor="middle"
-                fontSize="8" fontWeight="bold" fill={color} opacity={animated ? 1 : 0}
-                style={{ transition: "opacity 0.5s ease 0.6s" }}>
+              <text x={x + barW / 2} y={animated ? 84 - fullH - 5 : 84} textAnchor="middle"
+                fontSize="11" fontWeight="800" fill={color}
+                style={{ transition: `opacity 0.4s ease ${0.5 + i*0.06}s, y 0.9s ease`, opacity: animated ? 1 : 0 }}>
                 {d.value}
               </text>
             )}
-            <text x={x + (colW - 6) / 2} y={78} textAnchor="middle"
-              fontSize="9" fontWeight="600" fill="#94a3b8">
+            {/* Month label */}
+            <text x={x + barW / 2} y={100} textAnchor="middle"
+              fontSize="11" fontWeight="700" fill="#94a3b8">
               {d.label}
             </text>
           </g>
@@ -46,28 +51,28 @@ function BarChart({ data, color }) {
 function DonutChart({ slices }) {
   const total = slices.reduce((s, c) => s + c.value, 0) || 1;
   const [animated, setAnimated] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setAnimated(true), 200); return () => clearTimeout(t); }, []);
-  const r = 38, cx = 50, cy = 50, circ = 2 * Math.PI * r;
+  useEffect(() => { const tm = setTimeout(() => setAnimated(true), 250); return () => clearTimeout(tm); }, []);
+  const r = 42, cx = 56, cy = 56, circ = 2 * Math.PI * r;
   let offset = 0;
   return (
-    <svg viewBox="0 0 100 100" className="w-32 h-32">
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth="14" />
+    <svg viewBox="0 0 112 112" className="w-40 h-40">
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth="15" />
       {slices.map((s, i) => {
         const dash = animated ? (s.value / total) * circ : 0;
         const el = (
-          <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth="14"
+          <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth="15"
             strokeDasharray={`${dash} ${circ - dash}`}
             strokeDashoffset={-offset}
             strokeLinecap="round"
             transform={`rotate(-90 ${cx} ${cy})`}
-            style={{ transition: `stroke-dasharray 1s cubic-bezier(.4,0,.2,1) ${i * 0.2}s` }}
+            style={{ transition: `stroke-dasharray 1.1s cubic-bezier(.4,0,.2,1) ${i * 0.25}s` }}
           />
         );
         offset += (s.value / total) * circ;
         return el;
       })}
-      <text x={cx} y={cy + 5} textAnchor="middle" fontSize="14" fontWeight="bold" fill="#f1f5f9">{total}</text>
-      <text x={cx} y={cy + 17} textAnchor="middle" fontSize="8" fill="#94a3b8">total</text>
+      <text x={cx} y={cy + 7} textAnchor="middle" fontSize="18" fontWeight="900" fill="#f1f5f9">{total}</text>
+      <text x={cx} y={cy + 20} textAnchor="middle" fontSize="9" fontWeight="600" fill="#94a3b8">órdenes</text>
     </svg>
   );
 }
@@ -88,7 +93,7 @@ function KPICard({ icon, label, value, sub, accent, t }) {
         style={{ background: `radial-gradient(circle at 80% 20%, ${accent}, transparent 70%)` }} />
       <div className="z-10 text-2xl">{icon}</div>
       <div className="z-10">
-        <div className="text-3xl font-black tracking-tight" style={{ color: t.text }}>{value}</div>
+        <div className="text-4xl font-black tracking-tight" style={{ color: t.text }}>{value}</div>
         <div className="text-xs font-semibold uppercase tracking-widest mt-0.5" style={{ color: accent }}>{label}</div>
         {sub && <div className="text-xs mt-0.5" style={{ color: t.textMuted }}>{sub}</div>}
       </div>
@@ -237,7 +242,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="md:col-span-2 rounded-2xl p-5" style={{ background: t.bgCard, border: `1px solid ${t.border}` }}>
             <h3 className="font-bold text-sm uppercase tracking-widest mb-1" style={{ color: t.text }}>Órdenes por mes</h3>
-            <p className="text-xs mb-4" style={{ color: t.textMuted }}>Últimos 6 meses</p>
+            <p className="text-xs mb-2" style={{ color: t.textMuted }}>Últimos 6 meses</p>
             <BarChart data={monthData} color={t.accent} />
           </div>
           <div className="rounded-2xl p-5 flex flex-col items-center justify-center gap-4" style={{ background: t.bgCard, border: `1px solid ${t.border}` }}>
