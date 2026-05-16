@@ -27,21 +27,13 @@ export default function UsersAdminPage() {
     setLoading(true);
     setError(null);
     try {
-      // superadmin usa /users/all (info completa), admin usa /users
-      const endpoint = isSuperAdmin ? "/users/all" : "/users";
-      const res = await axios.get(endpoint, { withCredentials: true });
+      // Ambos roles usan /users/all — único endpoint disponible en el backend
+      const res = await axios.get("/users/all", { withCredentials: true });
       setUsers(res.data);
     } catch (err) {
       console.error("Error cargando usuarios:", err);
       setError("No se pudieron cargar los usuarios. Verifica tu sesión.");
-      // Intentar con /users como fallback
-      try {
-        const res = await axios.get("/users", { withCredentials: true });
-        setUsers(res.data);
-        setError(null);
-      } catch {
-        setUsers([]);
-      }
+      setUsers([]);
     } finally {
       setLoading(false);
     }

@@ -84,8 +84,8 @@ export default function TaskFormPage() {
   const is = { background: t.input, border: `1px solid ${t.inputBorder}`, color: t.text };
 
   useEffect(() => {
-    // fix: llama /users sin prefijo /api
-    axios.get("/users", { withCredentials: true }).then(r => setUsers(r.data)).catch(() => {});
+    // fix: usa /users/all — único endpoint del backend
+    axios.get("/users/all", { withCredentials: true }).then(r => setUsers(r.data)).catch(() => {});
   }, []);
 
   useEffect(() => {
