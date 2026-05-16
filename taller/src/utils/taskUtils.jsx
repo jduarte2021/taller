@@ -1,11 +1,11 @@
-import axios from "axios";
+import axios from "../api/axios";
 import Swal from "sweetalert2";
 import html2pdf from "html2pdf.js";
 
 // Función para marcar tarea como completada
 export const handleCompleteTask = async (taskId, getTasks) => {
     try {
-        await axios.put(`/api/tasks/${taskId}/complete`);
+        await axios.put(`/tasks/${taskId}/complete`);
         Swal.fire({
             title: "¡Completado!",
             text: "La tarea se marcó como completada.",

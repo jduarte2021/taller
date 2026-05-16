@@ -81,7 +81,7 @@ const Sidebar = () => {
         <div className="px-4 py-3" style={{ borderBottom: `1px solid ${t.sidebarBorder}` }}>
           <div className="flex items-center gap-2">
             {user?.profileImage ? (
-              <img src={`https://taller-8qh1.onrender.com/uploads/${user.profileImage}`}
+              <img src={`${(import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/api$/, "")}/uploads/${user.profileImage}`}
                 alt="avatar" className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                 style={{ border: `2px solid ${t.accent}` }}
                 onError={e => { e.target.style.display="none"; }} />
@@ -131,7 +131,7 @@ const Sidebar = () => {
         <div className="px-3 py-2" style={{ borderTop: `1px solid ${t.sidebarBorder}` }}>
           <button onClick={async () => {
             try {
-              const res = await fetch("https://taller-8qh1.onrender.com/api/tasks/backup", { credentials: "include" });
+              const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000/api"}/tasks/backup`, { credentials: "include" });
               const blob = await res.blob();
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a"); a.href = url;
