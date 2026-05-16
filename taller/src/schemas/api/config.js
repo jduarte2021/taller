@@ -1,7 +1,7 @@
 // URL base del backend - usa variable de entorno en producción, localhost en dev
 export const API_BASE = import.meta.env.VITE_API_URL
-  //? import.meta.env.VITE_API_URL.replace('/api', '')
-  //: 'http://localhost:3000';
+  ? import.meta.env.VITE_API_URL.replace('/api', '')
+  : 'http://localhost:3000';
 
 // Construye URL de imagen de perfil
 export const getAvatarUrl = (profileImage) => {
