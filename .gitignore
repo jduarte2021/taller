@@ -1,9 +1,4 @@
-# En la raíz de tu proyecto, crea .gitignore si no existe
-cat > .gitignore << 'EOF'
 node_modules/
 .env
 src/uploads/*
 !src/uploads/.gitkeep
-EOF
-
-mkdir -p src/uploads && touch src/uploads/.gitkeep
